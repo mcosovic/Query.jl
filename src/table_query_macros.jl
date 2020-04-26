@@ -41,7 +41,7 @@ macro select(args...)
         elseif typeof(arg) == QuoteNode
             # select by name
             prev = :( merge($prev, QueryOperators.NamedTupleUtilities.select(_, Val($(arg)))) )
-        elseif arg isa Expr && arg.head==:call && length(arg.args)==3 && arg.args[1]==Symbol(":")
+        elseif arg isa Expr && arg.head == :call && length(arg.args) == 3 && arg.args[1] == Symbol(":")
             arg = string(arg)
             # select by range, with multiple syntaxes supported
             m_range = match(r"^:([^,:]+) *: *:([^,:]+)", arg)
@@ -95,9 +95,9 @@ macro select(args...)
                         sel = :( QueryOperators.NamedTupleUtilities.occursin(_, Val($(QuoteNode(Symbol(m_pred[2]))))) )
                     end
                 else
-                    if m_pred[1] == "startswith"
+                        if m_pred[1] == "startswith"
                         sel = :( QueryOperators.NamedTupleUtilities.not_startswith(_, Val($(QuoteNode(Symbol(m_pred[2]))))) )
-                    elseif m_pred[1] == "endswith"
+                        elseif m_pred[1] == "endswith"
                         sel = :( QueryOperators.NamedTupleUtilities.not_endswith(_, Val($(QuoteNode(Symbol(m_pred[2]))))) )
                     elseif m_pred[1] == "occursin"
                         sel = :( QueryOperators.NamedTupleUtilities.not_occursin(_, Val($(QuoteNode(Symbol(m_pred[2]))))) )
@@ -198,28 +198,28 @@ macro dissallowna()
 end
 
 macro dissallowna(columns...)
-    return :( Query.@mutate( $( ( :( $(columns[i].value) = our_get(_.$(columns[i].value))  ) for i=1:length(columns) )... )   ) )
+    return :( Query.@mutate( $( ( :( $(columns[i].value) = our_get(_.$(columns[i].value))  ) for i = 1:length(columns) )... )   ) )
 end
 
 macro dropna()
-    return :( i-> i |> Query.@filter(!any(isna, _)) |>  Query.@dissallowna() )
+    return :( i->i |> Query.@filter(!any(isna, _)) |>  Query.@dissallowna() )
 end
 
 macro dropna(columns...)
-    return :( i-> i |> Query.@filter(!any(($((:(isna(_.$(columns[i].value))) for i in 1:length(columns)  )...),))) |> Query.@dissallowna($(columns...)) )
+    return :( i->i |> Query.@filter(!any(($((:(isna(_.$(columns[i].value))) for i in 1:length(columns)  )...),))) |> Query.@dissallowna($(columns...)) )
 end
 
 macro replacena(arg, args...)
-    if length(args)==0 && !(arg isa Expr && arg.head==:call && length(arg.args)==3 && arg.args[1]==:(=>))
+    if length(args) == 0 && !(arg isa Expr && arg.head == :call && length(arg.args) == 3 && arg.args[1] == :(=>))
         return :( Query.@map(map(i->our_get(i, $arg), _)) )
     else
         args = [arg; args...]
 
-        all(i isa Expr && i.head==:call && length(i.args)==3 && i.args[1]==:(=>)  for i in args) || error("Invalid syntax.")
+        all(i isa Expr && i.head == :call && length(i.args) == 3 && i.args[1] == :(=>)  for i in args) || error("Invalid syntax.")
 
         columns = map(i->i.args[2].value, args)
         replacement_values = map(i->i.args[3], args)
 
-        return :( Query.@mutate( $( ( :( $(columns[i]) = our_get(_.$(columns[i]), $(replacement_values[i]))  ) for i=1:length(columns) )... )   ) )
+        return :( Query.@mutate( $( ( :( $(columns[i]) = our_get(_.$(columns[i]), $(replacement_values[i]))  ) for i = 1:length(columns) )... )   ) )
     end
 end

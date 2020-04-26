@@ -13,19 +13,19 @@ using DataTables
     @bench "one column" @from i in $dt begin
         @group i.A by i.B into g
         @select {m = mean(g)}
-        @collect 
+        @collect
     end
-    
+
     @bench "two columns" @from i in $dt begin
         @group {i.A, i.B} by i.B into g
         @select {m = mean(g.A)}
-        @collect 
+        @collect
     end
 
     @bench "three columns" @from i in $dt begin
         @group {i.A, i.B, i.C} by i.B into g
         @select {m = mean(g.A)}
-        @collect 
+        @collect
     end
 end
 
@@ -68,7 +68,7 @@ end
         @bench "IntegerTest" @from i in $dt begin
             @group i.A by i.A into g
             @select g
-            @collect 
+            @collect
         end
     end
 
